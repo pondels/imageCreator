@@ -1,11 +1,9 @@
 from PIL import Image
 from itertools import permutations
-import random
-# import cv2
 
 class GenerateImage:
 
-    def __init__(self, color_mode='RGB', width=3380, height=2160, filename='generatedImage', format='png'):
+    def __init__(self, color_mode='RGB', width=7680, height=4320, filename='generatedImage', format='png'):
         '''
             color_mode = 'RGB' by default
             width = 1920 by default
@@ -29,18 +27,21 @@ class GenerateImage:
 
         for i in range(self.width):
             x = i - self.width // 2
+            # x = i
             for j in range(self.height):
                 y = j - self.height // 2
+                # y = j
 
                 pallen = len(self.palette)
                 # randomNumber = 14 * (1920/1080) * (self.height/self.width)
                 randomNumber = 15500/(min(self.width, self.height) ** 2)
-                # index = int(round(i*i*randomNumber, 0)) + int(round(j*j*randomNumber, 0))
-                index = int(round(x*x*x*randomNumber, 0)) + int(round(y*y*y*randomNumber, 0))
+                index = int(round(i*i*randomNumber, 0)) + int(round(j*j*randomNumber, 0))
+                # index = int(round(x*x*x*randomNumber, 0)) + int(round(y*y*y*randomNumber, 0))
                 if index >= pallen: index = pallen - 1
                 elif index < 0: index = 0
                 grabber = pallen - 1 - index
                 color = self.palette[grabber]
+                # color = (n << 21) + (n << 10) + n*8
                 image.putpixel((i, j), color)
 
         image.save(self.image_name)
@@ -78,32 +79,36 @@ class GenerateImage:
         modifier = .01/(2*(self.height/800))
         iterations = 255
 
-        for i in range(self.width):
-            x = i - self.width // 2
-            for j in range(self.height):
-                y = j - self.height // 2
-                a = -.5 + x*modifier
-                b = -.5 + y*modifier
+        for i in range(self.height):
+            x = i - self.height // 2
+            for j in range(self.width):
+                y = j - self.width // 2
+                a = -.05 + x*modifier
+                b = -.05 + y*modifier
+                # c = -.5 + (x+y)*modifier
 
                 ca = a
                 cb = b
+                # cc = c
 
-                n = 0
+                n = iterations
 
-                while n < iterations:
-                    aa = a*a - b*b
+                while n > 1:
+                    aa = a*a + b*b
                     bb = 2 * a * b
+                    # ccc = a * b * c
 
                     a = aa + ca
                     b = bb + cb
+                    # c = ccc + cc
 
-                    if (abs(a + b) > 16): break
-                    n += 1
+                    # if (abs(a + b + c) > 25): break
+                    if (abs(a + b) > 25): break
+                    n -= 1
 
-                if n == 0: n = 1
-                # color = self.palette[16581119 % int(round(n * n * 16.581119, 0))]
                 color = (n << 21) + (n << 10) + n*8
-                image.putpixel((i, j), color)
+                image.putpixel((j, i), color)
+            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_name)
         image.save(self.image_name)
 
     def formula4(self):
@@ -115,21 +120,28 @@ class GenerateImage:
         moveX, moveY = 0.0, 0.0
         maxIter = 255
     
-        for x in range(self.width):
-            for y in range(self.height):
-                zx = 1.5*(x - self.width/2)/(0.5*zoom*self.width) + moveX
-                zy = 1.0*(y - self.height/2)/(0.5*zoom*self.height) + moveY
-                i = maxIter
-                while zx*zx + zy*zy < 4 and i > 1:
+        for i in range(self.width):
+            for j in range(self.height):
+
+                zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
+                zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
+                n = maxIter
+                while zx*zx + zy*zy < 4 and n > 1:
                     tmp = zx*zx - zy*zy + cX
-                    zy,zx = 2.0*zx*zy + cY, tmp
-                    i -= 1
+                    zy,zx = 2.0*zx*zy - cY, tmp
+                    n -= 1
     
                 # convert byte to RGB (3 bytes), kinda 
                 # magic to get nice colors
-                color = (i << 21) + (i << 10) + i*8
-                image.putpixel((x, y), color)
+                color = (n << 21) + (n << 10) + n*8
+                image.putpixel((i, j), color)
         image.save(self.image_name)
 
-GI = GenerateImage()
-GI.formula4()
+    def formula5(self):
+        pass
+    
+GI = GenerateImage(filename='backrooms')
+# GI.formula1()
+# GI.formula2() # My Own
+GI.formula3() # Backrooms???
+# GI.formula4() # Manipulated Julia Set

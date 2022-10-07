@@ -76,7 +76,7 @@ class GenerateImage:
 
         image = Image.open(self.image_name)
 
-        modifier = .01/(2*(self.height/800))
+        modifier = .1/(2*(self.height/800))
         iterations = 255
 
         for i in range(self.height):
@@ -140,7 +140,7 @@ class GenerateImage:
     def formula5(self):
         pass
     
-GI = GenerateImage(filename='backrooms')
+GI = GenerateImage(filename='hallway')
 # GI.formula1()
 # GI.formula2() # My Own
 GI.formula3() # Backrooms???

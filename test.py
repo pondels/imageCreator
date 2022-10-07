@@ -135,13 +135,14 @@ class GenerateImage:
                 # magic to get nice colors
                 color = (n << 21) + (n << 10) + n*8
                 image.putpixel((i, j), color)
+            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_name)
         image.save(self.image_name)
 
     def formula5(self):
         pass
     
-GI = GenerateImage(filename='hallway')
+GI = GenerateImage(filename='julia')
 # GI.formula1()
 # GI.formula2() # My Own
-GI.formula3() # Backrooms???
-# GI.formula4() # Manipulated Julia Set
+# GI.formula3() # Backrooms???
+GI.formula4() # Manipulated Julia Set

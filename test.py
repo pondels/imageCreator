@@ -26,19 +26,24 @@ class GenerateImage:
 
         image = Image.open(self.image_directory + self.image_name)
 
-        for i in range(self.height):
-            for j in range(self.width):
+        frames = 120
+        step = .05
 
-                pallen = len(self.palette)
-                randomNumber = 15500/(min(self.width, self.height) ** 2)
-                index = int(round(i*i*randomNumber, 0)) + int(round(j*j*randomNumber, 0))
-                if index >= pallen: index = pallen - 1
-                elif index < 0: index = 0
-                grabber = pallen - 1 - index
-                color = self.palette[grabber]
-                image.putpixel((j, i), color)
-            if (self.width - i) % (self.width * .1) == 0: image.save(self.image_directory + self.image_name)
-        image.save(self.image_directory + self.image_name)
+        for frame in range(frames):
+            for i in range(self.height):
+                for j in range(self.width):
+                    pallen = len(self.palette)
+                    randomNumber = 15500/(min(self.width, self.height) ** (-2 + frame * step))
+                    index = int(round(i*i*randomNumber, 0)) + int(round(j*j*randomNumber, 0))
+                    if index >= pallen: index = pallen - 1
+                    elif index < 0: index = 0
+                    grabber = pallen - 1 - index
+                    color = self.palette[grabber]
+                    image.putpixel((j, i), color)
+            #     if (self.width - i) % (self.width * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.width - i) % (self.width * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
 
     def lazer(self):
 
@@ -73,37 +78,42 @@ class GenerateImage:
         modifier = .01/(2*(self.height/800))
         iterations = 255
 
-        for i in range(self.height):
-            x = i - self.height // 2
-            for j in range(self.width):
-                y = j - self.width // 2
-                a = -.05 + x*modifier # - self.height // (i*i + 1)
-                b = -.05 + y*modifier # - self.width // (j*j + 1)
-                # c = -.5 + (x+y)*modifier
+        frames = 120
+        step = .1
+        for frame in range(frames):
+            for i in range(self.height):
+                x = i - self.height // 2
+                for j in range(self.width):
+                    y = j - self.width // 2
+                    a = -.05 + x*modifier # - self.height // (i*i + 1)
+                    b = -.05 + y*modifier # - self.width // (j*j + 1)
+                    # c = -.5 + (x+y)*modifier
 
-                ca = a
-                cb = b
-                # cc = c
+                    ca = a
+                    cb = b
+                    # cc = c
 
-                n = iterations
+                    n = iterations
 
-                while n > 1:
-                    aa = a*a + b*b
-                    bb = 2 * a * b
-                    # ccc = a * b * c
+                    while n > 1:
+                        aa = a*a + b*b
+                        bb = (-6 + frame*step) * a * b
+                        # ccc = a * b * c
 
-                    a = aa + ca
-                    b = bb + cb
-                    # c = ccc + cc
+                        a = aa + ca
+                        b = bb + cb
+                        # c = ccc + cc
 
-                    # if (abs(a + b + c) > 25): break
-                    if (abs(a + b) > 25): break
-                    n -= 1
+                        # if (abs(a + b + c) > 25): break
+                        if (abs(a + b) > 25): break
+                        n -= 1
 
-                color = (n << 21) + (n << 10) + n*8
-                image.putpixel((j, i), color)
-            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
-        image.save(self.image_directory + self.image_name)
+                    color = (n << 21) + (n << 10) + n*8
+                    image.putpixel((j, i), color)
+            #     if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.height - i) % (self.height * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
 
     def album(self):
         # Julia Set
@@ -114,49 +124,59 @@ class GenerateImage:
         moveX, moveY = 0.0, 0.0
         maxIter = 255
     
-        for i in range(self.width):
-            for j in range(self.height):
+        frames = 120
+        step = .1
+        for frame in range(frames):
+            for i in range(self.width):
+                for j in range(self.height):
 
-                zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
-                zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
-                n = maxIter
-                while zx-zx * zy-zy < 10 and n > 1:
-                    # tmp = zx*zx - zy*zy + cX
-                    tmp = zx+zx * zy-zy / cX
-                    # zy,zx = 2.0*zx*zy - cY, tmp
-                    zy,zx = 2.0*zx*zy // cY, tmp
-                    n -= 1
-    
-                # convert byte to RGB (3 bytes), kinda 
-                # magic to get nice colors
-                color = (-n << 21) + (-n << 10) + n*8
-                image.putpixel((i, j), color)
-            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
-        image.save(self.image_directory + self.image_name)
+                    zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
+                    zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
+                    n = maxIter
+                    while zx-zx * zy-zy < 10 and n > 1:
+                        # tmp = zx*zx - zy*zy + cX
+                        tmp = zx+zx * zy-zy / cX
+                        # zy,zx = 2.0*zx*zy - cY, tmp
+                        zy,zx = (-6 + frame*step)*zx*zy // cY, tmp
+                        n -= 1
+        
+                    # convert byte to RGB (3 bytes), kinda 
+                    # magic to get nice colors
+                    color = (-n << 21) + (-n << 10) + n*8
+                    image.putpixel((i, j), color)
+            #     if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.height - i) % (self.height * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
 
-    def formula5(self):
+    def oregon(self):
         image = Image.open(self.image_directory + self.image_name)
 
         zoom = 1
         cX, cY = -0.369, -0.17015
         moveX, moveY = 0.0, 0.0
         maxIter = 255
-    
-        for i in range(self.width):
-            for j in range(self.height):
+        
+        frames = 120
+        step = .1
+        for frame in range(frames):
+            for i in range(self.width):
+                for j in range(self.height):
 
-                zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
-                zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
-                n = maxIter
-                while zx-zy * zx-zy < 10 and n > 1:
-                    tmp = zy-zx * zx-zy / cY
-                    zy,zx = 2.0*zx-zy / cX, tmp
-                    n -= 1
+                    zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
+                    zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
+                    n = maxIter
+                    while zx-zy * zx-zy < 10 and n > 1:
+                        tmp = zy-zx * zx-zy / cY
+                        zy,zx = (-6 + frame*step)*zx-zy / cX, tmp
+                        n -= 1
 
-                color = (-n << 21) + (-n << 10) + -n*8
-                image.putpixel((i, j), color)
-            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
-        image.save(self.image_directory + self.image_name)
+                    color = (-n << 21) + (-n << 10) + -n*8
+                    image.putpixel((i, j), color)
+                # if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.height - i) % (self.height * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
     
     def jumpin(self):
         image = Image.open(self.image_directory + self.image_name)
@@ -168,44 +188,81 @@ class GenerateImage:
         modifier = .00001/(2*(self.height/800))
         iterations = 255
 
-        for i in range(self.height):
-            x = i - self.height // 2
-            for j in range(self.width):
-                y = j - self.width // 2
-                a = -1 + x*modifier
-                b = -.05 + y*modifier
-                
-                ca = a
-                cb = b
+        frames = 120
+        step = .25
+        for frame in range(15, frames):
+            for i in range(self.height):
+                x = i - self.height // 2
+                for j in range(self.width):
+                    y = j - self.width // 2
+                    a = -1 + x*modifier
+                    b = -.05 + y*modifier
+                    
+                    ca = a
+                    cb = b
 
-                zx = 1.5*(i - self.width/2)/(5*zoom*self.width) + moveX
-                zy = 1.0*(j - self.height/2)/(5*zoom*self.height) + moveY
-                
-                n = iterations
+                    zx = 1.5*(i - self.width/2)/(5*zoom*self.width) + moveX
+                    zy = 1.0*(j - self.height/2)/(5*zoom*self.height) + moveY
+                    
+                    n = iterations
 
-                while zx-zy * zx-zy < 10 and n > 1:
-                    aa = a*a + b*b
-                    bb = 2 * a * b
+                    while zx-zy * zx-zy < 10 and n > 1:
+                        aa = a*a + b*b
+                        bb = 2 * a * b
 
 
-                    tmp = zx*zx + zy*zy / cX
-                    zy,zx = 2.0*zx-zx / cY, tmp
+                        tmp = zx*zx + zy*zy / cX
+                        zy,zx = (-6 + frame*step)*zx-zx / cY, tmp
 
-                    a = aa + ca - zy
-                    b = bb + cb - zx
+                        a = aa + ca - zy
+                        b = bb + cb - zx
 
-                    if (abs(-a - b - zx - zy) > 25): break
-                    n -= 1
+                        if (abs(-a - b - zx - zy) > 25): break
+                        n -= 1
 
-                color = (n << 21) + (n << 10) + n*8
-                image.putpixel((j, i), color)
-            if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
-        image.save(self.image_directory + self.image_name)
+                    color = (n << 21) + (n << 10) + n*8
+                    image.putpixel((j, i), color)
+                # if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.height - i) % (self.height * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
 
-GI = GenerateImage(width = 1280, height = 720, filename='test')
-# GI.cricles()
+    def unnamed(self):
+        image = Image.open(self.image_directory + self.image_name)
+
+        zoom = 1
+        cX, cY = -0.369, -0.17015
+        moveX, moveY = 0.0, 0.0
+        maxIter = 255
+
+        frames = 120
+        step = .1
+        for frame in range(59, frames):
+            for i in range(self.width):
+                # x = i - self.width // 2
+                for j in range(self.height):
+                    # y = j - self.height // 2
+
+                    zx = 1.5*(i - self.width/2)/(0.5*zoom*self.width) + moveX
+                    zy = 1.0*(j - self.height/2)/(0.5*zoom*self.height) + moveY
+                    n = maxIter
+                    while zx-zy * zx-zy < 10 and n > 1:
+                        tmp = zy+zy * zx+zx * cY
+                        zy,zx = (-6 + frame * step) * zx+zy / cX, -tmp
+                        n -= 1
+
+                    color = (-n << 21) + (-n << 10) + -n*8
+                    image.putpixel((i, j), color)
+                # if (self.height - i) % (self.height * .1) == 0: image.save(self.image_directory + self.image_name)
+                if (self.height - i) % (self.height * .1) == 0: image.save(f'./animation/{frame}.png')
+            # image.save(self.image_directory + self.image_name)
+            image.save(f'./animation/{frame}.png')
+
+GI = GenerateImage(width = 600, height = 360, filename='test')
+GI.circles()
 # GI.lazer() # My Own
 # GI.backrooms() # Backrooms???
 # GI.album() # Manipulated Julia Set
-GI.formula5() # Manipulated Julia Set 2
+# GI.oregon() # Manipulated Julia Set 2Can you go in a bit deeper?
 # GI.jumpin()
+# GI.unnamed()
